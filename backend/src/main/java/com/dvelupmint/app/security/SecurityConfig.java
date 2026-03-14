@@ -61,7 +61,7 @@ public class SecurityConfig {
         System.out.println("SecurityConfig: @EnableMethodSecurity is active");
         http
                 .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
+               // .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/clients/**").authenticated()

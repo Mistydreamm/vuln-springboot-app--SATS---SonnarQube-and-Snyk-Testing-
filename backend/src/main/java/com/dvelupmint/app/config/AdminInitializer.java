@@ -19,7 +19,7 @@ public class AdminInitializer {
     private static final String ADMIN_USERNAME = "superadmin";
 
     @Value("${spring.datasource.AdminPassword}")
-    private String ADMIN_PASSWORD; // Removed the final attribute or the @Value don't work
+    private String adminPassword; // Removed the final attribute or the @Value don't work
 
     @Bean
     CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -32,7 +32,7 @@ public class AdminInitializer {
                 admin = new User();
                 admin.setEmail(ADMIN_EMAIL);
                 admin.setUsername(ADMIN_USERNAME);
-                admin.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
+                admin.setPassword(passwordEncoder.encode(adminPassword));
                 admin.setRole("ADMIN");
             } else {
                 admin = optionalUser.get();
@@ -46,7 +46,7 @@ public class AdminInitializer {
             }
 
             userRepository.save(admin);
-            log.warn("SUPERADMIN ENSURED → login with: {} / {}", ADMIN_EMAIL, ADMIN_PASSWORD);
+            log.warn("SUPERADMIN ENSURED → login with: {} / {}", ADMIN_EMAIL, adminPassword);
         };
     }
 }
