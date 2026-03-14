@@ -4,6 +4,7 @@ import com.dvelupmint.app.model.User;
 import com.dvelupmint.app.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,9 @@ public class AdminInitializer {
 
     private static final String ADMIN_EMAIL = "superadmin@email.com";
     private static final String ADMIN_USERNAME = "superadmin";
-    private static final String ADMIN_PASSWORD = "admin123";
+
+    @Value("${spring.datasource.AdminPassword}")
+    private String ADMIN_PASSWORD; // Removed the final attribute or the @Value don't work
 
     @Bean
     CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
