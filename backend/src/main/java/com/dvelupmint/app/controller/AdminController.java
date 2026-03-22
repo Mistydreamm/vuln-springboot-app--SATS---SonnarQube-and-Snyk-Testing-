@@ -117,12 +117,9 @@ public class AdminController {
 
         for (Long id : userIds) {
             User user = userRepo.findById(id).orElse(null);
-            if (user == null) {
-                continue;
-            }
 
             // Skip protected users and self
-            if (user.getEmail().equals(currentEmail) ||
+            if (user == null || user.getEmail().equals(currentEmail) ||
                     PROTECTED_EMAILS.contains(user.getEmail())) {
                 continue;
             }
