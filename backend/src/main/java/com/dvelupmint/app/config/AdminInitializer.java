@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AdminInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(AdminInitializer.class);
-
+    private static final String ADMIN = "ADMIN";
     private static final String ADMIN_EMAIL = "superadmin@email.com";
     private static final String ADMIN_USERNAME = "superadmin";
 
@@ -33,12 +33,12 @@ public class AdminInitializer {
                 admin.setEmail(ADMIN_EMAIL);
                 admin.setUsername(ADMIN_USERNAME);
                 admin.setPassword(passwordEncoder.encode(adminPassword));
-                admin.setRole("ADMIN");
+                admin.setRole(ADMIN);
             } else {
                 admin = optionalUser.get();
-                if (!"ADMIN".equals(admin.getRole())) {
+                if (!ADMIN.equals(admin.getRole())) {
                     log.warn("Repairing superadmin role → was {}, setting to ADMIN", admin.getRole());
-                    admin.setRole("ADMIN");
+                    admin.setRole(ADMIN);
                 } else {
                     log.info("Superadmin already exists with correct role");
                     return;
