@@ -130,7 +130,7 @@ public class AdminController {
                 userRepo.deleteById(id);
                 deletedCount++;
             } catch (Exception ignored) {
-                ignored.printStackTrace();
+                //ignored
             }
         }
 

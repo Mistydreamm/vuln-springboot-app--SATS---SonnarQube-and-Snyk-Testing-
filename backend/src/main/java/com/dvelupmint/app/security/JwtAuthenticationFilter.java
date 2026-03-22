@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static final Logger loggerInstance = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -38,44 +38,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String requestUri = request.getMethod() + " " + request.getRequestURI();
 
-        logger.info("JWT Filter - Processing request: {}", requestUri);
-        logger.info("JWT Filter - Authorization header: {}", authHeader);
+        loggerInstance.info("JWT Filter - Processing request: {}", requestUri);
+        loggerInstance.info("JWT Filter - Authorization header: {}", authHeader);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            logger.info("JWT Filter - No valid Bearer token found → continuing as anonymous");
+            loggerInstance.info("JWT Filter - No valid Bearer token found → continuing as anonymous");
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = authHeader.substring(7);
-        logger.info("JWT Filter - Token received (first 30 chars): {}",
+        loggerInstance.info("JWT Filter - Token received (first 30 chars): {}",
                 token.length() > 30 ? token.substring(0, 30) + "..." : token);
 
         try {
             // Step 1: Validate token first
             if (!jwtUtil.validateToken(token)) {
-                logger.warn("JWT Filter - validateToken returned false for token");
+                loggerInstance.warn("JWT Filter - validateToken returned false for token");
                 filterChain.doFilter(request, response);
                 return;
             }
 
             // Step 2: Extract email/subject
             String email = jwtUtil.extractEmail(token);
-            logger.info("JWT Filter - Extracted email/subject: {}", email);
+            loggerInstance.info("JWT Filter - Extracted email/subject: {}", email);
 
             if (email == null) {
-                logger.warn("JWT Filter - Email/subject is null after extraction");
+                loggerInstance.warn("JWT Filter - Email/subject is null after extraction");
                 filterChain.doFilter(request, response);
                 return;
             }
 
             // Step 3: Check if authentication is already set
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                logger.info("JWT Filter - No existing authentication → loading user");
+                loggerInstance.info("JWT Filter - No existing authentication → loading user");
 
                 // Step 4: Load user details
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                logger.info("JWT Filter - User loaded successfully: username={}, authorities={}",
+                loggerInstance.info("JWT Filter - User loaded successfully: username={}, authorities={}",
                         userDetails.getUsername(), userDetails.getAuthorities());
 
                 // Step 5: Create authentication token
@@ -88,13 +88,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                logger.info("JWT Filter - Authentication SET SUCCESSFULLY for user: {}", email);
+                loggerInstance.info("JWT Filter - Authentication SET SUCCESSFULLY for user: {}", email);
             } else {
-                logger.info("JWT Filter - Authentication already present → skipping");
+                loggerInstance.info("JWT Filter - Authentication already present → skipping");
             }
 
         } catch (Exception e) {
-            logger.error("JWT Filter - Authentication failed for request {}: {}", requestUri, e.getMessage(), e);
+            loggerInstance.error("JWT Filter - Authentication failed for request {}: {}", requestUri, e.getMessage(), e);
         }
 
         filterChain.doFilter(request, response);
