@@ -14,6 +14,8 @@ import java.util.List;
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
+    private static final String ADMIN = "ADMIN";
+    private static final String USER_NOT_FOUND = "User not found with ID";
 
     private static final List<String> PROTECTED_EMAILS = List.of(
             "superadmin@email.com",
@@ -39,13 +41,13 @@ public class AdminController {
     @PutMapping("/promote/{id}")
     public ResponseEntity<String> promoteUser(@PathVariable Long id) {
         User user = userRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND + id));
 
-        if ("ADMIN".equals(user.getRole())) {
+        if (ADMIN.equals(user.getRole())) {
             return ResponseEntity.badRequest().body("User is already an admin.");
         }
 
-        user.setRole("ADMIN");
+        user.setRole(ADMIN);
         userRepo.save(user);
 
         return ResponseEntity.ok("User promoted to admin successfully.");
@@ -56,7 +58,7 @@ public class AdminController {
             @PathVariable Long id,
             @RequestHeader("Authorization") String authHeader) {
         User targetUser = userRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND + id));
 
         String currentEmail = extractEmailFromHeader(authHeader);
 
@@ -70,7 +72,7 @@ public class AdminController {
             return ResponseEntity.badRequest().body("❌ This account is protected from demotion.");
         }
 
-        if (!"ADMIN".equals(targetUser.getRole())) {
+        if (!ADMIN.equals(targetUser.getRole())) {
             return ResponseEntity.badRequest().body("User is not an admin.");
         }
 
@@ -85,7 +87,7 @@ public class AdminController {
             @PathVariable Long id,
             @RequestHeader("Authorization") String authHeader) {
         User targetUser = userRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND + id));
 
         String currentEmail = extractEmailFromHeader(authHeader);
 
