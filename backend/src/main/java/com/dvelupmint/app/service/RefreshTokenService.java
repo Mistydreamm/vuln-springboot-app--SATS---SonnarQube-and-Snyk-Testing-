@@ -55,16 +55,21 @@ exemple of code i want
         this.userRepository = userRepository;
     }
 
-    public RefreshToken createRefreshToken(Long userId){
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setCreatedAt(Instant.now());
-        refreshToken.setToken(UUID.randomUUID().toString()); //todo : use SecureRandom instead of UUID
-        refreshToken.setExpiryDate(LocalDateTime.now().plusNanos(refreshExpirationMs*1000)); //no plusMillis method
-        refreshToken.setUser(userRepository.findById(userId).get());
+    public RefreshToken createRefreshToken(Long userId) throws Exception {
 
-        refreshToken.setRevoked(false);
-        refreshTokenRepository.save(refreshToken);
-        return refreshToken;
+        try {
+            RefreshToken refreshToken = new RefreshToken();
+            refreshToken.setCreatedAt(Instant.now());
+            refreshToken.setToken(UUID.randomUUID().toString()); //todo : use SecureRandom instead of UUID
+            refreshToken.setExpiryDate(LocalDateTime.now().plusNanos(refreshExpirationMs*1000)); //no plusMillis method
+            refreshToken.setUser(userRepository.findById(userId).get());
+
+            refreshToken.setRevoked(false);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
