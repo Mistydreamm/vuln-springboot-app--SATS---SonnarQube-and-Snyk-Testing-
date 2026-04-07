@@ -1,25 +1,26 @@
 package com.dvelupmint.app.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class RefreshToken {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String token;
-    private LocalDate expiryDate;
+    private LocalDateTime expiryDate;
     private boolean revoked;
     @ManyToOne
     private User user;
     private Instant createdAt;
     private String replacedByToken;
 
-    public RefreshToken(Long id, String token, LocalDate expiryDate, boolean revoked, User user, Instant createdAt, String replacedByToken) {
+    public RefreshToken(Long id, String token, LocalDateTime expiryDate, boolean revoked, User user, Instant createdAt, String replacedByToken) {
         this.id = id;
         this.token = token;
         this.expiryDate = expiryDate;
@@ -49,12 +50,12 @@ public class RefreshToken {
         this.token = token;
     }
 
-    public LocalDate getExpiryDate() {
+    public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
 
     public void setExpiryDate(LocalDate expiryDate) {
-        this.expiryDate = expiryDate;
+        this.expiryDate = expiryDate.atStartOfDay();
     }
 
     public boolean isRevoked() {
