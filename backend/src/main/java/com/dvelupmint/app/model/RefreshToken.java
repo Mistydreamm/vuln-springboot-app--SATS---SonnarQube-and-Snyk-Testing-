@@ -54,8 +54,8 @@ public class RefreshToken {
         return expiryDate;
     }
 
-    public void setExpiryDate(LocalDate expiryDate) {
-        this.expiryDate = expiryDate.atStartOfDay();
+    public void setExpiryDate(LocalDateTime expiryDate) {
+        this.expiryDate =  expiryDate;
     }
 
     public boolean isRevoked() {
