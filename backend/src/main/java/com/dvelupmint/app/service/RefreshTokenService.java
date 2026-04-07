@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalUnit;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class RefreshTokenService {
@@ -68,7 +69,7 @@ exemple of code i want
             refreshTokenRepository.save(refreshToken);
             return refreshToken;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new NoSuchElementException(e);
         }
     }
 }
