@@ -2,8 +2,10 @@ package com.dvelupmint.app.controller;
 
 import com.dvelupmint.app.model.User;
 import com.dvelupmint.app.payload.RegisterRequest;
+import com.dvelupmint.app.repository.RefreshTokenRepository;
 import com.dvelupmint.app.repository.UserRepository;
 import com.dvelupmint.app.security.JwtUtil;
+import com.dvelupmint.app.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,13 +24,14 @@ public class AuthController {
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-
+    private final RefreshTokenService  refreshTokenService;
     // Constructor-based injection of dependencies (repository, encoder, and JWT)
     @Autowired
-    public AuthController(UserRepository userRepo, PasswordEncoder encoder, JwtUtil jwtUtil) {
+    public AuthController(UserRepository userRepo, PasswordEncoder encoder, JwtUtil jwtUtil,  RefreshTokenService refreshTokenService) {
         this.userRepo = userRepo;
         this.passwordEncoder = encoder;
         this.jwtUtil = jwtUtil;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/register")
@@ -80,11 +83,24 @@ public class AuthController {
             claims.put("role", dbUser.getRole());
             claims.put("username", dbUser.getUsername());
             String token = jwtUtil.generateTokenWithClaims(claims, dbUser.getEmail());
+            String refreshToken = refreshTokenService.createRefreshToken(dbUser.getId()).getToken();
 
-            return ResponseEntity.ok(Map.of("token", token));
+            return ResponseEntity.ok(Map.of("token", token,  "refreshToken", refreshToken));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> credentials) {
+        String refreshToken = credentials.get("refreshToken");
+        Map response;
+        try {
+            response = refreshTokenService.rotateToken(refreshToken);
+        } catch (Exception e) {
+            return ResponseEntity.status(403).body("Invalid refreshToken");
+        }
+        return ResponseEntity.ok(response);
     }
 
 }
