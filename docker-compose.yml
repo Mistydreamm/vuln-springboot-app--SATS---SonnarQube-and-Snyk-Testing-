@@ -16,12 +16,13 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
       SPRING_DATASOURCE_USERNAME: ${DB_NAME:?DB_NAME required}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET required}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       SPRING_APPLICATION_NAME: demo
     depends_on:
       - postgres
