@@ -5,9 +5,12 @@ import com.dvelupmint.app.model.User;
 import com.dvelupmint.app.repository.RefreshTokenRepository;
 import com.dvelupmint.app.repository.UserRepository;
 import com.dvelupmint.app.security.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -16,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class RefreshTokenService {
@@ -101,6 +105,14 @@ public class RefreshTokenService {
             Exception InvalidTokenException = new Exception("Invalid token");
             throw InvalidTokenException;
         }
-
     }
+    @Scheduled(fixedDelay = 12, timeUnit = TimeUnit.HOURS) //
+    @Transactional
+    public void deleteExpiredTokens(){
+        LocalDateTime now = LocalDateTime.now();
+        LOGGER.trace("Deletion of the expired refresh tokens");
+
+        refreshTokenRepository.deleteByExpiryDateBefore(now);
+    }
+
 }
