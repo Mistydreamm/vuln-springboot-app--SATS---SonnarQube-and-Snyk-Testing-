@@ -85,7 +85,7 @@ public class AuthController {
             String token = jwtUtil.generateTokenWithClaims(claims, dbUser.getEmail());
             String refreshToken = refreshTokenService.createRefreshToken(dbUser.getId()).getToken();
 
-            return ResponseEntity.ok(Map.of("token", token,  "refreshToken", refreshToken));
+            return ResponseEntity.ok(Map.of("accessToken", token,  "refreshToken", refreshToken));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
