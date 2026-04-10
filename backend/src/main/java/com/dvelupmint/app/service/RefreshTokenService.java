@@ -106,13 +106,21 @@ public class RefreshTokenService {
             throw InvalidTokenException;
         }
     }
-    @Scheduled(fixedDelay = 12, timeUnit = TimeUnit.HOURS) //
+    @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.SECONDS) //
     @Transactional
     public void deleteExpiredTokens(){
         LocalDateTime now = LocalDateTime.now();
         LOGGER.trace("Deletion of the expired refresh tokens");
 
         refreshTokenRepository.deleteByExpiryDateBefore(now);
+    }
+
+    @Transactional
+    public void logoutAllUserSessions(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        refreshTokenRepository.revokeAllByUserId(user.getId());
+        LOGGER.info("User {} logged out: All refresh tokens revoked.", email);
     }
 
 }
